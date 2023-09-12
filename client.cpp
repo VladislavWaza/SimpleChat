@@ -5,13 +5,11 @@ Client::Client()
     _socket = new QTcpSocket(this);
     connect(_socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
     connect(_socket, &QTcpSocket::disconnected, this, &Client::deleteLater);
-    connect(_socket, &QTcpSocket::errorOccurred, this, &Client::slotErrorOccurred);
-    connect(_socket, &QTcpSocket::hostFound, this, &Client::slotHostFound);
 }
 
 Client::~Client()
 {
-    //delete _socket;
+    delete _socket;
 }
 
 void Client::slotReadyRead()
@@ -26,18 +24,9 @@ void Client::slotReadyRead()
             QString str;
             in >> str;
 
-            /*
-            // Если не докачалось, то ждём новую порцию данных.
-            if(data.isEmpty() == true) {
-                in.rollbackTransaction();
-                qDebug() << "Empty error";
-                return;
-            }
-            */
-
             if (in.commitTransaction() == false)
             {
-                qDebug() << "Transaction error";
+                emit debugMsg("Transaction error");
                 return;
             }
             emit readyRead(str);
@@ -45,29 +34,34 @@ void Client::slotReadyRead()
     }
     else
     {
-        qDebug() << "QDataStream error";
+        emit debugMsg("QDataStream error when reading");
     }
 }
 
-void Client::slotErrorOccurred(QAbstractSocket::SocketError socketError)
-{
-    qDebug() << "socketError: " << socketError;
-}
-
-void Client::slotHostFound()
-{
-    qDebug() << "host found";
-
-}
-
-void Client::connectToServer()
+bool Client::connectToServer()
 {
     _socket->connectToHost("127.0.0.1", 4236); // только комп
+    if (_socket->waitForConnected(1000))
+        emit debugMsg("Connected!");
+    else
+    {
+        emit debugMsg("Error: " + _socket->errorString());
+        return false;
+    }
+    return true;
 }
 
-void Client::disconnectFromServer()
+bool Client::disconnectFromServer()
 {
     _socket->disconnectFromHost();
+    if (_socket->state() == QAbstractSocket::UnconnectedState || _socket->waitForDisconnected(1000))
+        emit debugMsg("Disconnected!");
+    else
+    {
+        emit debugMsg("Error: " + _socket->errorString());
+        return false;
+    }
+    return true;
 }
 
 void Client::sendToServer(const QString& msg)
@@ -82,6 +76,6 @@ void Client::sendToServer(const QString& msg)
     }
     else
     {
-        qDebug() << "QDataStream error";
+        emit debugMsg("QDataStream error when sending");
     }
 }

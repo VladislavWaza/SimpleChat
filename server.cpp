@@ -4,18 +4,14 @@ Server::Server()
 {
     //слушаем входящие сообщения по всем адресам, порт 4236
     if(this->listen(QHostAddress::Any, 4236))
-    {
-        qDebug() << "start";
-    }
+        emit debugMsg("Server start");
     else
-    {
-        qDebug() << "error";
-    }
+        emit debugMsg("Listen error");
 }
 
 Server::~Server()
 {
-    qDebug() << "end";
+    emit debugMsg("Server end");
     deleteLater();
 }
 
@@ -23,7 +19,7 @@ void Server::slotDisconnected()
 {
     _socket = reinterpret_cast<QTcpSocket*>(sender());
     _sockets.removeOne(_socket);
-    qDebug() << "client disconnected";
+    emit debugMsg("Client disconnected, clients now: " + QString::number(_sockets.size()));
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -34,7 +30,7 @@ void Server::incomingConnection(qintptr socketDescriptor)
     connect(_socket, &QTcpSocket::disconnected, this, &Server::slotDisconnected); //объединям сигналы disconnected с функцией deleteLater
 
     _sockets.push_back(_socket);
-    qDebug() << "client connected" << socketDescriptor;
+    emit debugMsg("Client " + QString::number(socketDescriptor) + " connected, clients now: " + QString::number(_sockets.size()));
 }
 
 void Server::slotReadyRead()
@@ -50,26 +46,18 @@ void Server::slotReadyRead()
             QString str;
             in >> str;
 
-            /*
-            // Если не докачалось, то ждём новую порцию данных.
-            if(data.isEmpty() == true) {
-                in.rollbackTransaction();
-                qDebug() << "Empty error";
-                return;
-            }
-            */
             if (in.commitTransaction() == false)
             {
-                qDebug() << "Transaction error";
+                emit debugMsg("Transaction error");
                 return;
             }
-            qDebug() << str;
+            emit debugMsg(str);
             SendToClient(str);
         }
     }
     else
     {
-        qDebug() << "QDataStream error";
+        emit debugMsg("QDataStream error when reading");
     }
 }
 
@@ -80,13 +68,12 @@ void Server::SendToClient(QString msg)
     out.setVersion(QDataStream::Qt_6_4);
     if(out.status() == QDataStream::Ok)
     {
-        qDebug() << "send...";
         out << msg;
         for (int i = 0; i < _sockets.size(); ++i)
             _sockets[i]->write(_data);
     }
     else
     {
-        qDebug() << "QDataStream error";
+        emit debugMsg("QDataStream error when sending");
     }
 }

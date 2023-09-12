@@ -11,17 +11,16 @@ public:
     Client();
     ~Client();
 
-    void connectToServer();
-    void disconnectFromServer();
+    bool connectToServer();
+    bool disconnectFromServer();
     void sendToServer(const QString &msg);
 
 signals:
     void readyRead(QString& msg);
+    void debugMsg(QString msg);
 
 public slots:
     void slotReadyRead();
-    void slotErrorOccurred(QAbstractSocket::SocketError socketError);
-    void slotHostFound();
 
 private:
     QTcpSocket *_socket;

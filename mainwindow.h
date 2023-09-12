@@ -28,6 +28,10 @@ private slots:
 
     void slotReadyRead(QString &msg);
 
+    void slotClientDebug(QString msg);
+
+    void slotServerDebug(QString msg);
+
 private:
     Ui::MainWindow *ui;
     Server *_server;

@@ -12,6 +12,9 @@ public:
     Server();
     ~Server();
 
+signals:
+    void debugMsg(QString msg);
+
 private:
     QTcpSocket *_socket;
     QVector <QTcpSocket*> _sockets;
