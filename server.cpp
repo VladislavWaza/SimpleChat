@@ -1,12 +1,9 @@
+#include <QTimer>
 #include "server.h"
 
 Server::Server()
 {
-    //слушаем входящие сообщения по всем адресам, порт 4236
-    if(this->listen(QHostAddress::Any, 4236))
-        emit debugMsg("Server start");
-    else
-        emit debugMsg("Listen error");
+    QTimer::singleShot(200, this, &Server::slotListen);
 }
 
 Server::~Server()
@@ -76,4 +73,13 @@ void Server::SendToClient(QString msg)
     {
         emit debugMsg("QDataStream error when sending");
     }
+}
+
+void Server::slotListen()
+{
+    //слушаем входящие сообщения по всем адресам, порт 4236
+    if(this->listen(QHostAddress::Any, 4236))
+        emit debugMsg("Server start");
+    else
+        emit debugMsg("Listen error: " + errorString());
 }
