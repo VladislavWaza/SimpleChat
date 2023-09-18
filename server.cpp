@@ -6,6 +6,10 @@ Server::Server()
 
 Server::~Server()
 {
+    for(int i = 0; i < _sockets.size(); i++)
+    {
+        _sockets[i]->disconnectFromHost();
+    }
     deleteLater();
 }
 

@@ -20,7 +20,6 @@ MainWindow::~MainWindow()
         delete _server;
     if (_client)
     {
-        disconnect(_client, &Client::readyRead, this, &MainWindow::slotReadyRead);
         _client->disconnectFromServer();
         delete _client;
     }
@@ -71,9 +70,6 @@ void MainWindow::on_connect_clicked()
     {
         if (_client->disconnectFromServer())
         {
-            disconnect(_client, &Client::debugMsg, this, &MainWindow::slotClientDebug);
-            disconnect(_client, &Client::readyRead, this, &MainWindow::slotReadyRead);
-            disconnect(_client, &Client::disconnected, this, &MainWindow::slotClientDisconnected);
             _client = nullptr; //само удаление _client происходит после отключения c помощью deleteLater
             ui->connect->setText("Connect to the server");
             ui->name->setEnabled(true);

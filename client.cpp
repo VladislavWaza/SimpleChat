@@ -41,7 +41,7 @@ void Client::slotReadyRead()
 void Client::slotDisconnected()
 {
     emit debugMsg("Disconnected!");
-    emit disconnect();
+    emit disconnected();
     deleteLater();
 }
 
