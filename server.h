@@ -26,7 +26,6 @@ public slots:
     void incomingConnection(qintptr socketDescriptor) override; // обработчик подлючений
     void slotReadyRead();
     void slotDisconnected();
-    void slotListen();
 
 };
 

@@ -34,13 +34,31 @@ void MainWindow::on_server_clicked()
         disconnect(_server, &Server::debugMsg, this, &MainWindow::slotServerDebug);
         delete _server;
         _server = nullptr;
-        ui->server->setText("Открыть сервер");
+        slotServerDebug("Server end");
+        ui->server->setText("Open the server");
     }
     else
     {
-        _server = new Server;
-        connect(_server, &Server::debugMsg, this, &MainWindow::slotServerDebug);
-        ui->server->setText("Закрыть сервер");
+        int port = ui->port->text().toInt();
+        if ((port < 1024) || (port > 65535))
+            slotServerDebug("Invalid port");
+        else //если порт корректный
+        {
+            _server = new Server;
+            connect(_server, &Server::debugMsg, this, &MainWindow::slotServerDebug);
+            if(_server->listen(QHostAddress::Any, port)) //если сервер слушает
+            {
+                slotServerDebug("Server start");
+                ui->server->setText("Close the server");
+            }
+            else
+            {
+                slotServerDebug("Listen error: " + _server->errorString());
+                disconnect(_server, &Server::debugMsg, this, &MainWindow::slotServerDebug);
+                delete _server;
+                _server = nullptr;
+            }
+        }
     }
 }
 
@@ -54,7 +72,7 @@ void MainWindow::on_connect_clicked()
             disconnect(_client, &Client::debugMsg, this, &MainWindow::slotClientDebug);
             disconnect(_client, &Client::readyRead, this, &MainWindow::slotReadyRead);
             _client = nullptr; //само удаление _client происходит после отключения c помощью deleteLater
-            ui->connect->setText("Подключиться к серверу");
+            ui->connect->setText("Connect to the server");
             ui->name->setEnabled(true);
             ui->lineEdit->setEnabled(false);
             ui->send->setEnabled(false);
@@ -69,7 +87,7 @@ void MainWindow::on_connect_clicked()
         {
             _clientName = ui->name->text();
             ui->name->setEnabled(false);
-            ui->connect->setText("Отключиться от сервера");
+            ui->connect->setText("Disconnect from the server");
             ui->lineEdit->setEnabled(true);
             ui->send->setEnabled(true);
         }
