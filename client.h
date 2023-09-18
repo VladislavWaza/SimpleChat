@@ -18,9 +18,11 @@ public:
 signals:
     void readyRead(QString& msg);
     void debugMsg(QString msg);
+    void disconnected();
 
 public slots:
     void slotReadyRead();
+    void slotDisconnected();
 
 private:
     QTcpSocket *_socket;

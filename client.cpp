@@ -4,7 +4,7 @@ Client::Client()
 {
     _socket = new QTcpSocket(this);
     connect(_socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
-    connect(_socket, &QTcpSocket::disconnected, this, &Client::deleteLater);
+    connect(_socket, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
 }
 
 Client::~Client()
@@ -38,6 +38,13 @@ void Client::slotReadyRead()
     }
 }
 
+void Client::slotDisconnected()
+{
+    emit debugMsg("Disconnected!");
+    emit disconnect();
+    deleteLater();
+}
+
 bool Client::connectToServer()
 {
     _socket->connectToHost("127.0.0.1", 4236); // только комп
@@ -55,7 +62,8 @@ bool Client::disconnectFromServer()
 {
     _socket->disconnectFromHost();
     if (_socket->state() == QAbstractSocket::UnconnectedState || _socket->waitForDisconnected(1000))
-        emit debugMsg("Disconnected!");
+    {
+    }
     else
     {
         emit debugMsg("Error: " + _socket->errorString());

@@ -30,6 +30,8 @@ private slots:
 
     void slotClientDebug(QString msg);
 
+    void slotClientDisconnected();
+
     void slotServerDebug(QString msg);
 
 private:
