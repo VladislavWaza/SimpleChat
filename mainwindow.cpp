@@ -77,6 +77,8 @@ void MainWindow::on_connect_clicked()
             _client = nullptr; //само удаление _client происходит после отключения c помощью deleteLater
             ui->connect->setText("Connect to the server");
             ui->name->setEnabled(true);
+            ui->hostAddress->setEnabled(true);
+            ui->portClient->setEnabled(true);
             ui->lineEdit->setEnabled(false);
             ui->send->setEnabled(false);
         }
@@ -87,10 +89,13 @@ void MainWindow::on_connect_clicked()
         connect(_client, &Client::debugMsg, this, &MainWindow::slotClientDebug);
         connect(_client, &Client::readyRead, this, &MainWindow::slotReadyRead);
         connect(_client, &Client::disconnected, this, &MainWindow::slotClientDisconnected);
-        if (_client->connectToServer()) //пытаемся подключиться
+        //пытаемся подключиться
+        if (_client->connectToServer(ui->hostAddress->text(), ui->portClient->text().toInt()))
         {
             _clientName = ui->name->text();
             ui->name->setEnabled(false);
+            ui->hostAddress->setEnabled(false);
+            ui->portClient->setEnabled(false);
             ui->connect->setText("Disconnect from the server");
             ui->lineEdit->setEnabled(true);
             ui->send->setEnabled(true);
@@ -105,8 +110,6 @@ void MainWindow::on_connect_clicked()
         }
     }
 }
-
-
 
 
 void MainWindow::on_send_clicked()
@@ -137,6 +140,8 @@ void MainWindow::slotClientDisconnected()
     _client = nullptr; //само удаление _client происходит после отключения c помощью deleteLater
     ui->connect->setText("Connect to the server");
     ui->name->setEnabled(true);
+    ui->hostAddress->setEnabled(true);
+    ui->portClient->setEnabled(true);
     ui->lineEdit->setEnabled(false);
     ui->send->setEnabled(false);
 }

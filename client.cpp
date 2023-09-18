@@ -45,9 +45,9 @@ void Client::slotDisconnected()
     deleteLater();
 }
 
-bool Client::connectToServer()
+bool Client::connectToServer(const QString &hostName, int port)
 {
-    _socket->connectToHost("127.0.0.1", 4236); // только комп
+    _socket->connectToHost(hostName, port);
     if (_socket->waitForConnected(1000))
         emit debugMsg("Connected!");
     else

@@ -11,7 +11,7 @@ public:
     Client();
     ~Client();
 
-    bool connectToServer();
+    bool connectToServer(const QString &hostName, int port);
     bool disconnectFromServer();
     void sendToServer(const QString &msg);
 
