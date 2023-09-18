@@ -8,9 +8,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     _server = nullptr;
     _client = nullptr;
-
-    //запустить несколько серверов и посмотреть что будет, новый просто не открывается?
-    //сообщение у клинета при отрубе сервера и отруб
 }
 
 MainWindow::~MainWindow()

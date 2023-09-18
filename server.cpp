@@ -6,9 +6,10 @@ Server::Server()
 
 Server::~Server()
 {
-    for(int i = 0; i < _sockets.size(); i++)
+    while (!_sockets.isEmpty())
     {
-        _sockets[i]->disconnectFromHost();
+        //при отключении клиента срабатывает слот slotDisconnected, который удаляет его из массива
+        _sockets[0]->disconnectFromHost();
     }
     deleteLater();
 }
